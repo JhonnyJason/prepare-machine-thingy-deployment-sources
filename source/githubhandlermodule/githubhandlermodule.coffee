@@ -1,8 +1,8 @@
 githubhandlermodule = {name: "githubhandlermodule"}
 
-OctokitREST = require("@octokit/rest")
+githubAPI = require("github-api")
 inquirer = require("inquirer")
-chalk       = require('chalk')
+c = require "chalk"
 CLI         = require('clui')
 Spinner     = CLI.Spinner
 
@@ -12,7 +12,7 @@ log = (arg) ->
     return
 
 #region internal variables
-octokit = null
+api = null
 
 authQuestions = [ 
     {
@@ -33,16 +33,6 @@ authQuestions = [
     }    
 ]
 
-twoFactorAuthentification = [
-    {
-        name: "twoFactorAuthenticationCode"
-        type: "input"
-        message: "2fa Code:"
-        validate: (value) ->
-            if value.length then return true;
-            else return 'Please!'
-    }
-]
 #endregion
 
 #region exposed variables
@@ -55,7 +45,7 @@ githubhandlermodule.initialize = () ->
     log "githubhandlermodule.initialize"
     
 #region internal functions
-buildOctokit = ->    
+connectAPI = ->
     authenticated = false
     
     while !authenticated
@@ -63,74 +53,86 @@ buildOctokit = ->
         status = new Spinner('Checking credentials...');
         
         options =
-            auth:
-                username: answers.username
-                password: answers.password
-                on2fa: -> 
-                    status.stop()
-                    answer = await inquirer.prompt(twoFactorAuthentification)
-                    status.start()
-                    return answer.twoFactorAuthenticationCode
-            userAgent:"thingycreate v0.1.0",
-            baseUrl: "https://api.github.com"
+            username: answers.username
+            password: answers.password
 
-        octokit = new OctokitREST(options)
         try
             status.start();
-            info = await octokit.users.getAuthenticated()
-            console.log(chalk.green("Credentials Check succeeded!"))
+            api = new githubAPI(options)
+            user = api.getUser()
+            profile = await user.getProfile()
+            # console.log "\n" + JSON.stringify profile.data
+            console.log(c.green("Credentials Check succeeded!"))
             githubhandlermodule.user = answers.username
             githubhandlermodule.password = answers.password
             authenticated = true
         catch err
-            console.log(chalk.red("Credentials Check failed!"))
+            console.log(c.red("Credentials Check failed!"))
         finally
             status.stop()
 #endregion
 
-#region exposed functions
+#region exposed fun
 githubhandlermodule.buildConnection = ->
-    if (octokit == null)
-        await buildOctokit()
+    if api == null
+        await connectAPI()
 
-githubhandlermodule.assertUserHasNotThatRepo = (repo) ->
-    if (octokit == null)
-        await buildOctokit()
-
-    try
-        await octokit.repos.get({owner:githubhandlermodule.user, repo:repo})
-        throw "Repository: " + repo + " did Exist for user:" + githubhandlermodule.user + "!"
-    catch err
-        if(err.status == 404)
-            return
-        throw err
-
-githubhandlermodule.checkIfUserHasRepo= (repo) ->
-    if(octokit == null)
-        await buildOctokit()
-
-    status = new Spinner("Checking if repo exists (" + githubhandlermodule.user + "/" + repo + ")...")
-    try
-        status.start()
-        await octokit.repos.get({owner:githubhandlermodule.user, repo:repo})
-        return true
-    catch err
-        return "Repository " + githubhandlermodule.user + "/" + repo + " does not exist!"
-    finally
-        status.stop()
-
-githubhandlermodule.createRepository = (repo) ->
-    if (octokit == null)
-        await buildOctokit()
-
-    result = await octokit.repos.createForAuthenticatedUser({name:repo, private:true})
-
-githubhandlermodule.deleteUserRepository = (repo) ->
-    if (octokit == null)
-        await buildOctokit()
+githubhandlermodule.addWebhook = (repo, url, secret) ->
+    log "githubhandlermodule.addWebhook"
+    repoHandle = api.getRepo(githubhandlermodule.user, repo)
     
-    result = await octokit.repos.delete({owner:githubhandlermodule.user,repo:repo})
-    #console.log(result)
+    config =
+        url: url
+        content_type: "json"
+        secret: secret
+    
+    webhookDescription =
+        name: "web"      
+        active: true
+        events: ["push"]
+        config: config  
+    
+    await repoHandle.createHook(webhookDescription)
+    
+githubhandlermodule.removeWebhook = (repo, url) ->
+    log "githubhandlermodule.getWebhook"
+    repoHandle = api.getRepo(githubhandlermodule.user, repo)
+    
+    result = await repoHandle.listHooks()
+    allHooks = result.data
+    idsToDelete = []
+    idsToDelete.push(hook.id) for hook in allHooks when hook.config.url is url
+
+    promises = (repoHandle.deleteHook(id) for id in idsToDelete)
+    await Promise.all(promises) 
+    return
+
+githubhandlermodule.addDeployKey = (repo, key, title) ->
+    log "githubhandlermodule.addDeployKey"
+    repoHandle = api.getRepo(githubhandlermodule.user, repo)
+    
+    keyDescription = 
+        title: title
+        key: key
+        read_only: true
+
+    await repoHandle.createKey(keyDescription)
+    
+githubhandlermodule.removeDeployKey = (repo, title) ->
+    log "githubhandlermodule.removeDeployKey"
+    repoHandle = api.getRepo(githubhandlermodule.user, repo)
+
+    result = await repoHandle.listKeys()
+    allKeys = result.data
+    idsToDelete = []
+    idsToDelete.push(key.id) for key in allKeys when key.title is title
+    
+    promises = (repoHandle.deleteKey(id) for id in idsToDelete)
+    await Promise.all(promises) 
+    return
+
+    
+
 
 #endregion
 

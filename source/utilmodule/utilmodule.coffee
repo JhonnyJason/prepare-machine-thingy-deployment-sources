@@ -3,6 +3,7 @@ utilmodule = {name: "utilmodule"}
 #region noode_modules
 execFile  = require('child_process').execFile
 exec = require("child_process").exec
+keygen = require("ssh-keygen")
 #endregion
 
 #log Switch
@@ -54,6 +55,19 @@ utilmodule.execGitCheckPromise = (path) ->
             if stderr then reject(new Error(stderr))
             resolve(stdout)
         exec("git rev-parse --is-inside-work-tree", options, callback)
+
+utilmodule.sshKeygen = (location) ->
+    options = 
+        location: location
+
+    return new Promise (resolve, reject) ->
+        callback = (error, out) ->
+            if error then reject(error)
+            result = 
+                privateKey: out.key
+                publicKey: out.pubKey
+            resolve(result)
+        keygen(options, callback)
 #endregion
 
 module.exports = utilmodule
