@@ -44,6 +44,7 @@ digestConfigFile = () ->
 #region exposed functions
 prepareprocessmodule.execute = (keysDirectory, configPath, mode) ->
     log "prepareprocessmodule.execute"
+
     await pathHandler.setKeysDirectory(keysDirectory)
     await pathHandler.setConfigFilePath(configPath)
     await digestConfigFile()
@@ -54,15 +55,6 @@ prepareprocessmodule.execute = (keysDirectory, configPath, mode) ->
         when "refresh" then await deploymentHandler.refreshDeployments()
         when "remove" then await deploymentHandler.removeDeployments()
     
-    #    
-    # thingy.digestConfig(cfg.public.thingies)
-    # useArguments(arg1, arg2)
-    # await pathHandler.tryUse(path)
-    # await github.buildConnection()
-    # await thingy.doUserInquiry()
-    # thingy.createRepositoryTree()
-    # await repositoryTree.initializeRepositories()
-    # await thingy.prepare()
     return true
 #endregion
 
