@@ -1,0 +1,15 @@
+[submodule "source/cloudservicemodule"]
+	path = source/cloudservicemodule
+	url = git@github.com:JhonnyJason/thingycreate-sources-cloudservicemodule.git
+[submodule "source/encryptionmodule"]
+	path = source/encryptionmodule
+	url = git@github.com:JhonnyJason/thingycreate-sources-encryptionmodule.git
+[submodule "source/globalscopemodule"]
+	path = source/globalscopemodule
+	url = git@github.com:JhonnyJason/thingycreate-sources-globalscopemodule.git
+[submodule "source/useractionmodule"]
+	path = source/useractionmodule
+	url = git@github.com:JhonnyJason/thingycreate-sources-useractionmodule.git
+[submodule "source/userconfigmodule"]
+	path = source/userconfigmodule
+	url = git@github.com:JhonnyJason/thingycreate-sources-userconfigmodule.git
