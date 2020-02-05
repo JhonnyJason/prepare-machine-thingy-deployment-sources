@@ -1,43 +1,38 @@
 startupmodule = {name: "startupmodule"}
 
-#region node_modules
+#region modulesFromEnvironment
 c = require "chalk"
-#endregion
 
-#log Switch
-log = (arg) ->
-    if allModules.debugmodule.modulesToDebug["startupmodule"]?  then console.log "[startupmodule]: " + arg
-    return
-
-#region internal variables
 prepareProcess = null
 cliArguments = null
 #endregion
 
-##initialization function  -> is automatically being called!  ONLY RELY ON DOM AND VARIABLES!! NO PLUGINS NO OHTER INITIALIZATIONS!!
+#region logPrintFunctions
+##############################################################################
+log = (arg) ->
+    if allModules.debugmodule.modulesToDebug["startupmodule"]?  then console.log "[startupmodule]: " + arg
+    return
+#endregion
+##############################################################################
 startupmodule.initialize = () ->
     log "startupmodule.initialize"
     prepareProcess = allModules.prepareprocessmodule
     cliArguments = allModules.cliargumentsmodule
+    return
 
-#region internal functions
-
-#endregion
-
-#region exposed functions
+#region exposedFunctions
 startupmodule.cliStartup = ->
     log "startupmodule.cliStartup"
     try
         e = cliArguments.extractArguments()
-        # console.log(chalk.yellow("caught arguments are: " + args._))
-        done = await prepareProcess.execute(e.keysDirectory, e.machineConfig, e.mode)
-        if done then console.log(c.green('All done!\n'));
+        await prepareProcess.execute(e.keysDirectory, e.machineConfig, e.mode)
+        console.log(c.green('All done!\n'));
     catch err
         console.log(c.red('Error!'));
         console.log(err)
         console.log("\n")
-
-#endregion exposed functions
+    return
+#endregion
 
 module.exports = startupmodule
 

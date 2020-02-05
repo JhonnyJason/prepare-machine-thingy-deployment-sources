@@ -2,27 +2,29 @@ prepareprocessmodule = {name: "prepareprocessmodule"}
 
 #region node_modules
 fs = require "fs"
-#endregion
 
-#log Switch
-log = (arg) ->
-    if allModules.debugmodule.modulesToDebug["prepareprocessmodule"]?  then console.log "[prepareprocessmodule]: " + arg
-    return
-
-#region internal variables
+#region localModules
 cfg = null
 github = null
 deploymentHandler = null
 pathHandler = null
 #endregion
+#endregion
 
-##initialization function  -> is automatically being called!  ONLY RELY ON DOM AND VARIABLES!! NO PLUGINS NO OHTER INITIALIZATIONS!!
+#region logPrintFunctions
+##############################################################################
+log = (arg) ->
+    if allModules.debugmodule.modulesToDebug["prepareprocessmodule"]?  then console.log "[prepareprocessmodule]: " + arg
+    return
+#endregion
+##############################################################################
 prepareprocessmodule.initialize = () ->
     log "prepareprocessmodule.initialize"
     cfg = allModules.configmodule
     github = allModules.githubhandlermodule
     deploymentHandler = allModules.deploymenthandlermodule
     pathHandler = allModules.pathhandlermodule
+    return
 
 #region internal functions
 digestConfigFile = () ->
@@ -41,13 +43,16 @@ digestConfigFile = () ->
 
 #endregion
 
-#region exposed functions
+#region exposedFunctions
 prepareprocessmodule.execute = (keysDirectory, configPath, mode) ->
     log "prepareprocessmodule.execute"
-
+    await cfg.checkUserConfig()
     await pathHandler.setKeysDirectory(keysDirectory)
     await pathHandler.setConfigFilePath(configPath)
     await digestConfigFile()
+    
+    throw "death on Purpose"
+    ## old code
     await github.buildConnection()
 
     switch mode
@@ -55,7 +60,7 @@ prepareprocessmodule.execute = (keysDirectory, configPath, mode) ->
         when "refresh" then await deploymentHandler.refreshDeployments()
         when "remove" then await deploymentHandler.removeDeployments()
     
-    return true
+    return
 #endregion
 
 module.exports = prepareprocessmodule

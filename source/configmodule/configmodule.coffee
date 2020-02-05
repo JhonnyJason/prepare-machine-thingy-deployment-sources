@@ -1,33 +1,58 @@
 configmodule = {name: "configmodule"}
 
-#region node_modules
+#region modulesFromEnvironment
+pathModule = require "path"
+os = require "os"
+
+userConfigModule = null
 #endregion
 
-#log Switch
-log = (arg) ->
-    if allModules.debugmodule.modulesToDebug["configmodule"]?  then console.log "[configmodule]: " + arg
-    return
-
-#region internal variables
-#endregion
-
-#region exposed variables
+#region exposedProperties
 configmodule.ipAddress = "0.0.0.0"
 configmodule.name = "defaultName"
 configmodule.webhookSecret = "defaultSecret"
 configmodule.webhookPort = "3000"
 configmodule.webhookURL = ""
+
+configmodule.cli =
+    userRelativeConfigPath: ".config/thingyBubble/userConfig.json"
+    userConfigPath: ""
 #endregion
 
-##initialization function  -> is automatically being called!  ONLY RELY ON DOM AND VARIABLES!! NO PLUGINS NO OHTER INITIALIZATIONS!!
+#region pre-init
+#region getVersionAndName
+packageJson = require "./package.json"
+configmodule.cli.version = packageJson.version
+configmodule.cli.name = packageJson.name
+#endregion
+
+homedir = os.homedir()
+
+#region defineUserConfigPath§
+userRelativeConfigPath = configmodule.cli.userRelativeConfigPath
+userConfigPath = pathModule.resolve(homedir, userRelativeConfigPath)  
+configmodule.cli.userConfigPath = userConfigPath
+#endregion
+
+configmodule.userConfig = null
+try
+    configmodule.userConfig = require(configmodule.cli.userConfigPath)
+catch err
+#endregion
+
+#region printLogFunctions
+##############################################################################
+log = (arg) ->
+    if allModules.debugmodule.modulesToDebug["configmodule"]?  then console.log "[configmodule]: " + arg
+    return
+#endregion
+##############################################################################
 configmodule.initialize = () ->
     log "configmodule.initialize"
+    userConfigModule = allModules.userconfigmodule
+    return
 
-#region internal functions
-
-#endregion
-
-#region exposed functions
+#region exposedFunctions
 configmodule.generateURL = () ->
     log "configmodule.genURL"
     configmodule.webhookURL = "http://" 
@@ -36,8 +61,11 @@ configmodule.generateURL = () ->
     configmodule.webhookURL += configmodule.webhookPort
     configmodule.webhookURL += "/webhook"
     
-    
-#endregion exposed functions
+configmodule.checkUserConfig = (configure) ->
+    log "configmodule.checkUserConfig"
+    if configmodule.userConfig then await userConfigModule.checkProcess(configure)
+    else await userConfigModule.userConfigurationProcess()
+    return
+#endregion
 
 module.exports = configmodule
-

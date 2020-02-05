@@ -13,6 +13,7 @@ Modules =
     startupmodule: require "./startupmodule"
     useractionmodule: require "./useractionmodule"
     userconfigmodule: require "./userconfigmodule"
+    userinquirermodule: require "./userinquirermodule"
     utilmodule: require "./utilmodule"
 
 module.exports = Modules
