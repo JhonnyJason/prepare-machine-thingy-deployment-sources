@@ -1,24 +1,18 @@
 cliargumentsmodule = {name: "cliargumentsmodule"}
-
-#region node_modules
-meow       = require('meow')
-# minimistOptions = require("minimist-options")
-#endregion
-
-#log Switch
+############################################################
 log = (arg) ->
     if allModules.debugmodule.modulesToDebug["cliargumentsmodule"]?  then console.log "[cliargumentsmodule]: " + arg
     return
 
-#region internal variables
+############################################################
+meow       = require('meow')
 
-#endregion
-
-##initialization function  -> is automatically being called!  ONLY RELY ON DOM AND VARIABLES!! NO PLUGINS NO OHTER INITIALIZATIONS!!
+############################################################
 cliargumentsmodule.initialize = () ->
     log "cliargumentsmodule.initialize"
 
-#region internal functions
+############################################################
+#region internalFunctions
 getHelpText = ->
     log "getHelpText"
     return """
@@ -57,9 +51,9 @@ getOptions = ->
             mode:
                 type: "string"
                 alias: "m"
-                default: "prepare"
     }
 
+############################################################
 extractMeowed = (meowed) ->
     log "extractMeowed"
     keysDirectory = ""
@@ -95,10 +89,9 @@ throwErrorOnUsageFail = (extract) ->
         throw "Usage error: option machineConfig was provided in an unexpected way!"
     if !(typeof extract.mode == "string")
         throw "Usage error: option mode was provided in an unexpected way!"
-
 #endregion
 
-#region exposed functions
+############################################################
 cliargumentsmodule.extractArguments = ->
     log "cliargumentsmodule.extractArguments"
     options = getOptions()
@@ -106,8 +99,6 @@ cliargumentsmodule.extractArguments = ->
     extract = extractMeowed(meowed)
     throwErrorOnUsageFail(extract)
     return extract
-
-#endregion exposed functions
 
 module.exports = cliargumentsmodule
 

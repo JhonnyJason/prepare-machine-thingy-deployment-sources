@@ -5,7 +5,6 @@ Modules =
     debugmodule: require "./debugmodule"
     deploymenthandlermodule: require "./deploymenthandlermodule"
     encryptionmodule: require "./encryptionmodule"
-    githubhandlermodule: require "./githubhandlermodule"
     globalscopemodule: require "./globalscopemodule"
     keymodule: require "./keymodule"
     pathhandlermodule: require "./pathhandlermodule"

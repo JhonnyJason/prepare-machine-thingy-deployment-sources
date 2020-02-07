@@ -1,10 +1,8 @@
 prepareprocessmodule = {name: "prepareprocessmodule"}
 ############################################################
-#region logPrintFunctions
 log = (arg) ->
     if allModules.debugmodule.modulesToDebug["prepareprocessmodule"]?  then console.log "[prepareprocessmodule]: " + arg
     return
-#endregion
 
 ############################################################
 #region modulesFromEnvironment
@@ -56,10 +54,6 @@ prepareprocessmodule.execute = (keysDirectory, configPath, mode) ->
     await pathHandler.setConfigFilePath(configPath)
     await digestConfigFile()
     
-    throw "death on Purpose"
-    ## old code
-    await github.buildConnection()
-
     switch mode
         when "prepare" then await deploymentHandler.prepareMissingDeployments()
         when "refresh" then await deploymentHandler.refreshDeployments()
