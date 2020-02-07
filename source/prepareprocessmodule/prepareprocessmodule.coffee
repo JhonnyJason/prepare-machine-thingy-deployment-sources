@@ -1,8 +1,17 @@
 prepareprocessmodule = {name: "prepareprocessmodule"}
+############################################################
+#region logPrintFunctions
+log = (arg) ->
+    if allModules.debugmodule.modulesToDebug["prepareprocessmodule"]?  then console.log "[prepareprocessmodule]: " + arg
+    return
+#endregion
 
-#region node_modules
+############################################################
+#region modulesFromEnvironment
+############################################################
 fs = require "fs"
 
+############################################################
 #region localModules
 cfg = null
 github = null
@@ -11,13 +20,7 @@ pathHandler = null
 #endregion
 #endregion
 
-#region logPrintFunctions
-##############################################################################
-log = (arg) ->
-    if allModules.debugmodule.modulesToDebug["prepareprocessmodule"]?  then console.log "[prepareprocessmodule]: " + arg
-    return
-#endregion
-##############################################################################
+############################################################
 prepareprocessmodule.initialize = () ->
     log "prepareprocessmodule.initialize"
     cfg = allModules.configmodule
@@ -26,7 +29,8 @@ prepareprocessmodule.initialize = () ->
     pathHandler = allModules.pathhandlermodule
     return
 
-#region internal functions
+############################################################
+#region internalFunctions
 digestConfigFile = () ->
     log "digestRepoListFile"
     requirePath = pathHandler.getConfigRequirePath() 
@@ -43,12 +47,10 @@ digestConfigFile = () ->
 
 #endregion
 
+############################################################
 #region exposedFunctions
 prepareprocessmodule.execute = (keysDirectory, configPath, mode) ->
     log "prepareprocessmodule.execute"
-    pathHandler.experiment()
-
-    throw "death on Purpose"
     await cfg.checkUserConfig()
     await pathHandler.setKeysDirectory(keysDirectory)
     await pathHandler.setConfigFilePath(configPath)
