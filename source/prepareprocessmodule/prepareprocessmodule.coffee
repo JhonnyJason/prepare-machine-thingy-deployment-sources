@@ -46,6 +46,9 @@ digestConfigFile = () ->
 #region exposedFunctions
 prepareprocessmodule.execute = (keysDirectory, configPath, mode) ->
     log "prepareprocessmodule.execute"
+    pathHandler.experiment()
+
+    throw "death on Purpose"
     await cfg.checkUserConfig()
     await pathHandler.setKeysDirectory(keysDirectory)
     await pathHandler.setConfigFilePath(configPath)
