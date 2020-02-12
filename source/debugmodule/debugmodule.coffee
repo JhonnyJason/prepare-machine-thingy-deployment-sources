@@ -8,9 +8,9 @@ debugmodule.initialize = () ->
 debugmodule.modulesToDebug = 
     unbreaker: true
     # cliargumentsmodule: true
-    cloudservicemodule: true
+    # cloudservicemodule: true
     # configmodule: true
-    deploymenthandlermodule: true
+    # deploymenthandlermodule: true
     # encryptionmodule: true
     # globalscopemodule
     # keymodule: true
