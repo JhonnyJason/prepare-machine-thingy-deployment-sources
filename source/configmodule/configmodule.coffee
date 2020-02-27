@@ -8,7 +8,7 @@ userConfigModule = null
 #endregion
 
 #region exposedProperties
-configmodule.ipAddress = "0.0.0.0"
+configmodule.serverName = "default.server.tld"
 configmodule.name = "defaultName"
 configmodule.webhookSecret = "defaultSecret"
 configmodule.webhookPort = "3000"
@@ -55,8 +55,8 @@ configmodule.initialize = () ->
 #region exposedFunctions
 configmodule.generateURL = () ->
     log "configmodule.genURL"
-    configmodule.webhookURL = "http://" 
-    configmodule.webhookURL += configmodule.ipAddress
+    configmodule.webhookURL = "https://" 
+    configmodule.webhookURL += configmodule.serverName
     configmodule.webhookURL += ":"
     configmodule.webhookURL += configmodule.webhookPort
     configmodule.webhookURL += "/webhook"

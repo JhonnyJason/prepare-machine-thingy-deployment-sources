@@ -34,7 +34,7 @@ digestConfigFile = () ->
     requirePath = pathHandler.getConfigRequirePath() 
     config = require(requirePath)
 
-    cfg.ipAddress = config.ipAddress
+    cfg.serverName = config.serverName
     cfg.name = config.name
     cfg.webhookSecret = config.webhookSecret
     cfg.webhookPort = config.webhookPort
